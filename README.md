@@ -37,6 +37,12 @@ cache format, LOD policy and defaults.
 - Prebuilt binaries for **macOS, Linux and Windows**; usable from GDScript and C#
 - Open source, MIT / Apache-2.0
 
+## Screenshots
+
+| cruise over the Grand Canyon | 400 m AGL (synthesized z16–17 terrain) | debug overlay (K / L) |
+|---|---|---|
+| ![cruise](screenshots/grand-canyon-cruise.jpg) | ![low](screenshots/grand-canyon-low.jpg) | ![overlay](screenshots/debug-overlay.jpg) |
+
 ## Run the demo
 
 Requires Godot 4.4+ (developed on 4.7) and a Rust toolchain.

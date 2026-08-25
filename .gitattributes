@@ -1,0 +1,12 @@
+# keep source-archive downloads (GitHub "Download ZIP", Asset Store source links) lean —
+# the distributable addon is addons/godotiles/ (binaries come from the release zip)
+.github         export-ignore
+.gitattributes  export-ignore
+.idea           export-ignore
+rust/target     export-ignore
+tests           export-ignore
+scripts         export-ignore
+plan.md         export-ignore
+screenshots     export-ignore
+release-please-config.json  export-ignore
+.release-please-manifest.json export-ignore
