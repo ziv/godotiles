@@ -1,0 +1,33 @@
+[package]
+name = "godotiles"
+version = "0.1.0" # x-release-please-version
+edition = "2021"
+rust-version = "1.85"
+description = "3D geospatial terrain streaming engine for Godot 4 (GDExtension)"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ziv/godotiles"
+readme = "../README.md"
+keywords = ["godot", "gdextension", "terrain", "gis", "streaming"]
+categories = ["game-development", "rendering"]
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+godot = { version = "0.5", features = ["api-4-4"] }
+crossbeam-channel = "0.5"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+ureq = "2"
+glam = "0.29"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+
+# debug builds of the extension must still decode / synthesize tiles at speed
+[profile.dev.package."*"]
+opt-level = 3

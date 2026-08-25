@@ -1,0 +1,13 @@
+# godot
+.godot/
+*.import.tmp
+# addon binaries are CI artifacts / scripts/build.sh output
+/addons/godotiles/bin/
+# rust
+/rust/target/
+# tile cache
+/.cache/
+# ide / os
+/.idea/
+.DS_Store
+tmp.md
