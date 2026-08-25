@@ -1,0 +1,15 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = 4.4
+; v1: worker threads make editor hot-reload risky
+reloadable = false
+
+[libraries]
+macos.debug = "res://addons/godotiles/bin/macos/libgodotiles.dylib"
+macos.release = "res://addons/godotiles/bin/macos/libgodotiles.dylib"
+linux.debug.x86_64 = "res://addons/godotiles/bin/linux-x86_64/libgodotiles.so"
+linux.release.x86_64 = "res://addons/godotiles/bin/linux-x86_64/libgodotiles.so"
+linux.debug.arm64 = "res://addons/godotiles/bin/linux-arm64/libgodotiles.so"
+linux.release.arm64 = "res://addons/godotiles/bin/linux-arm64/libgodotiles.so"
+windows.debug.x86_64 = "res://addons/godotiles/bin/windows-x86_64/godotiles.dll"
+windows.release.x86_64 = "res://addons/godotiles/bin/windows-x86_64/godotiles.dll"

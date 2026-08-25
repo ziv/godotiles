@@ -1,0 +1,9 @@
+{
+  "min-zoom": 9,
+  "max-zoom": 15,
+  "hm-path": ".cache/heightmap",
+  "nl-path": ".cache/normals",
+  "tx-path": ".cache/texture",
+  "concurrency": 16,
+  "retries": 3
+}
