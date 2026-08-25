@@ -1,0 +1,42 @@
+name: macOS Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths-ignore: [ "README.md", "plan.md" ]
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore: [ "README.md", "plan.md" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin, x86_64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Test
+        run: cargo test --manifest-path rust/Cargo.toml
+
+      - name: Build universal extension
+        run: scripts/build.sh release
+
+      - name: Verify architectures
+        run: lipo -info addons/godotiles/bin/macos/libgodotiles.dylib
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: addons/godotiles/bin/macos

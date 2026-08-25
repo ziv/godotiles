@@ -1,0 +1,40 @@
+name: Windows Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths-ignore: [ "README.md", "plan.md" ]
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore: [ "README.md", "plan.md" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Test
+        run: cargo test --manifest-path rust/Cargo.toml
+
+      - name: Build extension
+        run: |
+          cargo build --manifest-path rust/Cargo.toml --release
+          New-Item -ItemType Directory -Force addons/godotiles/bin/windows-x86_64 | Out-Null
+          Copy-Item rust/target/release/godotiles.dll addons/godotiles/bin/windows-x86_64/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x86_64
+          path: addons/godotiles/bin/windows-x86_64

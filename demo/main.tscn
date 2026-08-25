@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://demo/demo.gd" id="1_demo"]
+[ext_resource type="Script" path="res://demo/fly_camera.gd" id="2_fly"]
+[ext_resource type="Script" path="res://demo/debug_overlay.gd" id="3_dbg"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.25, 0.55, 0.95, 1)
+sky_horizon_color = Color(0.4, 0.749, 1, 1)
+ground_bottom_color = Color(0.4, 0.749, 1, 1)
+ground_horizon_color = Color(0.4, 0.749, 1, 1)
+
+[sub_resource type="Sky" id="Sky_sky"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_env"]
+background_mode = 2
+sky = SubResource("Sky_sky")
+ambient_light_source = 1
+tonemap_mode = 0
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_demo")
+
+[node name="TerrainStreamer" type="TerrainStreamer" parent="."]
+camera_path = NodePath("../Camera3D")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+fov = 60.0
+near = 1.0
+far = 400000.0
+script = ExtResource("2_fly")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_env")
+
+[node name="DebugOverlay" type="Node3D" parent="."]
+script = ExtResource("3_dbg")

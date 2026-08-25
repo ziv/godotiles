@@ -1,0 +1,77 @@
+name: Release
+
+# On a version tag: build the extension for every platform and attach the addon zip.
+on:
+  push:
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - run: scripts/build.sh release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-x86_64
+          path: addons/godotiles/bin/linux-x86_64
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin, x86_64-apple-darwin
+      - run: scripts/build.sh release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: addons/godotiles/bin/macos
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - run: |
+          cargo build --manifest-path rust/Cargo.toml --release
+          New-Item -ItemType Directory -Force addons/godotiles/bin/windows-x86_64 | Out-Null
+          Copy-Item rust/target/release/godotiles.dll addons/godotiles/bin/windows-x86_64/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x86_64
+          path: addons/godotiles/bin/windows-x86_64
+
+  package:
+    needs: [ linux, macos, windows ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-x86_64
+          path: addons/godotiles/bin/linux-x86_64
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos
+          path: addons/godotiles/bin/macos
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-x86_64
+          path: addons/godotiles/bin/windows-x86_64
+      - name: Zip addon
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          zip -r "godotiles-${VERSION}.zip" addons/godotiles
+          echo "ASSET=godotiles-${VERSION}.zip" >> "$GITHUB_ENV"
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET }}

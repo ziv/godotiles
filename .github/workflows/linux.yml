@@ -1,0 +1,61 @@
+name: Linux Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths-ignore: [ "README.md", "plan.md" ]
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore: [ "README.md", "plan.md" ]
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: 4.7.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Format check
+        run: cargo fmt --manifest-path rust/Cargo.toml --check
+
+      - name: Clippy
+        run: cargo clippy --manifest-path rust/Cargo.toml --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --manifest-path rust/Cargo.toml
+
+      - name: Build extension
+        run: scripts/build.sh release
+
+      - name: Install Godot (headless)
+        run: |
+          curl -sL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" godot
+          chmod +x godot
+
+      - name: Import project
+        run: ./godot --headless --path . --import || true
+
+      - name: Smoke test
+        run: ./godot --headless --path . -s tests/godot/smoke.gd
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-x86_64
+          path: addons/godotiles/bin/linux-x86_64
