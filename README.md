@@ -1,6 +1,7 @@
 <div align="center">
     <img src="icon.png" alt="logo" width="150"/>
     <br />
+    <h1>Godotiles</h1>
     <strong>3D geospatial engine for Godot 4</strong>
     <br />
     <br />
@@ -49,7 +50,7 @@ Requires Godot 4.4+ (developed on 4.7) and a Rust toolchain.
 
 ```sh
 scripts/build.sh release        # builds the extension into addons/godotiles/bin/<platform>/
-godot --path .                  # or open the project in the editor and press Play
+godot --path .                  # or open the project in the editor and press Play (addons/godotiles/demo/main.tscn)
 ```
 
 Flies over the Grand Canyon. **A/D** roll, **Q/E** yaw, **W/S** pitch, **+/-** throttle, **R**
@@ -60,7 +61,8 @@ reset after crashing into the terrain, **K** zoom labels, **L** tile bounds. Til
 
 Copy `addons/godotiles/` (with the `bin/` folder from a
 [release](https://github.com/ziv/godotiles/releases) or from `scripts/build.sh`) into your
-project. No plugin activation is needed — the classes are registered by the GDExtension.
+project. No plugin activation is needed — the classes are registered by the GDExtension. The addon folder also carries the
+demo (`addons/godotiles/demo/`) — delete it if you do not want it in your project.
 
 ```gdscript
 extends Node3D
@@ -84,7 +86,7 @@ raising it (≤ 22) opts into heightmaps synthesized from the native-zoom ancest
 default normals. Queries: `ground_height(pos)` (a float, or `null` when no tile covers the
 point), `is_loading` / `loading_progress` for a splash screen, `get_resident_tiles()` for debug
 overlays. Large worlds use the raytiles rebase convention via `world_offset`
-(`absolute = user − world_offset`); see `demo/demo.gd`.
+(`absolute = user − world_offset`); see `addons/godotiles/demo/demo.gd`.
 
 See [`plan.md`](plan.md) for the full design: coordinate spaces, the frame loop, the LOD policy,
 the tile lifecycle, the shader, and the list of traps.
@@ -97,7 +99,7 @@ the tile lifecycle, the shader, and the list of traps.
 | `rust/src/godot/` | the Godot shell: `TerrainStreamer` node, config resources, GPU resources |
 | `rust/shaders/terrain.gdshader` | displacement, lighting, fog (embedded into the binary) |
 | `addons/godotiles/` | the distributable addon |
-| `demo/` | the demo project scenes and scripts |
+| `addons/godotiles/demo/` | the demo scenes and scripts (ship with the addon) |
 | `tests/godot/` | headless smoke test (`godot --headless --path . -s tests/godot/smoke.gd`) |
 | `scripts/` | build script, cache pre-warmer (`node scripts/tiles-cache.mjs <x> <y>`) |
 

@@ -1,6 +1,12 @@
 name: Release
 
-# On a version tag: build the extension for every platform and attach the addon zip.
+# On a version tag (created by release-please): build the extension for every platform, commit
+# the prebuilt binaries into the tag itself (an off-branch commit on top of the tagged main
+# commit, so `main` stays binary-free and local builds never dirty the tree), and attach the
+# addon zip to the GitHub release. After this job:
+#   - the tag's source archive (GitHub "Download ZIP", Asset Store repository pulls) contains
+#     exactly addons/godotiles/** WITH bin/ — see .gitattributes for the export-ignore rules
+#   - godotiles-<version>.zip on the release contains the same addons/godotiles/** tree
 on:
   push:
     tags: [ "v*" ]
@@ -53,6 +59,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
           name: linux-x86_64
@@ -65,13 +73,39 @@ jobs:
         with:
           name: windows-x86_64
           path: addons/godotiles/bin/windows-x86_64
-      - name: Zip addon
+
+      - name: Verify every library referenced by the .gdextension exists
+        run: |
+          set -e
+          grep -oE 'res://[^"]+' addons/godotiles/godotiles.gdextension | sed 's#res://##' | sort -u | while read -r f; do
+            test -f "$f" || { echo "missing: $f"; exit 1; }
+            echo "ok: $f"
+          done
+
+      - name: Zip addon (addons/godotiles/** only)
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           zip -r "godotiles-${VERSION}.zip" addons/godotiles
+          unzip -l "godotiles-${VERSION}.zip"
           echo "ASSET=godotiles-${VERSION}.zip" >> "$GITHUB_ENV"
-      - name: Attach to release
+
+      - name: Commit the binaries into the release tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f addons/godotiles/bin
+          git commit -m "chore(release): prebuilt binaries for ${GITHUB_REF_NAME}"
+          git tag -f "${GITHUB_REF_NAME}"
+          git push -f origin "refs/tags/${GITHUB_REF_NAME}"
+
+      - name: Attach to the GitHub release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.ASSET }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: addon
+          path: ${{ env.ASSET }}

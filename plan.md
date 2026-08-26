@@ -163,7 +163,7 @@ godotiles/
 │       │   └── windows-x86_64/godotiles.dll
 │       ├── LICENSE-MIT, LICENSE-APACHE
 │       └── README.md              short usage + attribution
-├── demo/
+├── addons/godotiles/demo/         (ships inside the addon — the Asset Store wants the download to be addons/ only)
 │   ├── main.tscn                  fly demo (Grand Canyon)
 │   ├── quick_start.tscn           minimal scene (mirror of raytiles' quick_start.cpp)
 │   ├── fly_camera.gd
@@ -1115,7 +1115,13 @@ fine). Release profile is what ships; debug builds of the extension are for Rust
 only.
 
 The addon zip (`godotiles-<version>.zip`) contains `addons/godotiles/**` with all three
-platform binaries. Users unzip into their project root; the `.gdextension` is discovered
+platform binaries. **Asset Store packaging rules** (learned from a review rejection): the download
+must contain *only* `addons/godotiles/**` — so the demo lives inside the addon
+(`addons/godotiles/demo/`), `.gitattributes` `export-ignore`s every other top-level path, and
+`release.yml` commits the prebuilt binaries into the release *tag* (an off-`main` commit) so a
+repository/tag pull has every library the `.gdextension` references; a `.gdextension` must never
+list a library that is not shipped (no arm64 entry without an arm64 build). The store title is
+capitalized ("Godotiles"). Users unzip into their project root; the `.gdextension` is discovered
 automatically. macOS note for users: Gatekeeper may quarantine the unsigned dylib
 (`xattr -dr com.apple.quarantine addons/godotiles/bin/macos`); document it, plan code-signing later.
 

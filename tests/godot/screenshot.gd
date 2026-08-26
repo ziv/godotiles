@@ -15,7 +15,7 @@ func _run() -> void:
 	var out := args[0] if args.size() > 0 else "screenshot.png"
 	var wait := float(args[1]) if args.size() > 1 else 90.0
 
-	var scene: PackedScene = load("res://demo/main.tscn")
+	var scene: PackedScene = load("res://addons/godotiles/demo/main.tscn")
 	var main := scene.instantiate()
 	root.add_child(main)
 	var terrain: TerrainStreamer = main.get_node("TerrainStreamer")

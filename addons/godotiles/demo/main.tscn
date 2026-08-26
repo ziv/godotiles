@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://demo/demo.gd" id="1_demo"]
-[ext_resource type="Script" path="res://demo/fly_camera.gd" id="2_fly"]
-[ext_resource type="Script" path="res://demo/debug_overlay.gd" id="3_dbg"]
+[ext_resource type="Script" path="res://addons/godotiles/demo/demo.gd" id="1_demo"]
+[ext_resource type="Script" path="res://addons/godotiles/demo/fly_camera.gd" id="2_fly"]
+[ext_resource type="Script" path="res://addons/godotiles/demo/debug_overlay.gd" id="3_dbg"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.25, 0.55, 0.95, 1)

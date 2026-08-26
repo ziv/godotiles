@@ -1,4 +1,4 @@
-# godotiles addon
+# Godotiles
 
 3D geospatial terrain streaming for Godot 4 — streams satellite imagery and elevation tiles
 around a camera and renders them as GPU-displaced terrain. Full documentation, demo project and
@@ -13,6 +13,11 @@ automatically; the classes `TerrainStreamer`, `TerrainWorldConfig`, `TerrainStre
 Prebuilt binaries live in `bin/` (macOS universal, Linux x86_64, Windows x86_64). On macOS you
 may need to clear the quarantine flag of an unsigned download:
 `xattr -dr com.apple.quarantine addons/godotiles/bin/macos`.
+
+## Demo
+
+Open `addons/godotiles/demo/main.tscn` and press Play to fly over the Grand Canyon (first run
+downloads tiles into `.cache/` next to your project). `quick_start.tscn` is the minimal scene.
 
 ## Quick start
 

@@ -1,12 +1,23 @@
-# keep source-archive downloads (GitHub "Download ZIP", Asset Store source links) lean —
-# the distributable addon is addons/godotiles/ (binaries come from the release zip)
-.github         export-ignore
-.gitattributes  export-ignore
-.idea           export-ignore
-rust/target     export-ignore
-tests           export-ignore
-scripts         export-ignore
-plan.md         export-ignore
-screenshots     export-ignore
-release-please-config.json  export-ignore
-.release-please-manifest.json export-ignore
+# Source archives (GitHub "Download ZIP" of a tag, Asset Store repository pulls) must contain
+# ONLY the addon: addons/godotiles/**. Everything else is excluded from `git archive`.
+# Prebuilt binaries are committed into each release tag by .github/workflows/release.yml.
+/.github                        export-ignore
+/.gitattributes                 export-ignore
+/.gitignore                     export-ignore
+/.release-please-manifest.json  export-ignore
+/release-please-config.json     export-ignore
+/rust                           export-ignore
+/tests                          export-ignore
+/scripts                        export-ignore
+/screenshots                    export-ignore
+/plan.md                        export-ignore
+/project.godot                  export-ignore
+/icon.png                       export-ignore
+/icon.png.import                export-ignore
+/README.md                      export-ignore
+/LICENSE.md                     export-ignore
+/LICENSE-MIT                    export-ignore
+/LICENSE-APACHE                 export-ignore
+/CONTRIBUTING.md                export-ignore
+/SECURITY.md                    export-ignore
+/CHANGELOG.md                   export-ignore

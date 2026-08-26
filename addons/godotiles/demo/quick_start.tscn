@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://demo/quick_start.gd" id="1_qs"]
+[ext_resource type="Script" path="res://addons/godotiles/demo/quick_start.gd" id="1_qs"]
 
 [node name="QuickStart" type="Node3D"]
 script = ExtResource("1_qs")
