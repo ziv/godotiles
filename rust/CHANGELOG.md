@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/ziv/godotiles/compare/v0.1.1...v0.1.2) (2026-08-26)
+
+
+### Features
+
+* force new release ([#4](https://github.com/ziv/godotiles/issues/4)) ([fe96ad8](https://github.com/ziv/godotiles/commit/fe96ad8773e882f58e98b409f239794e86a34aa2))
+
 ## [0.1.1](https://github.com/ziv/godotiles/compare/v0.1.0...v0.1.1) (2026-08-25)
 
 
