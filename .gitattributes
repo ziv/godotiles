@@ -1,6 +1,6 @@
 # Source archives (GitHub "Download ZIP" of a tag, Asset Store repository pulls) must contain
 # ONLY the addon: addons/godotiles/**. Everything else is excluded from `git archive`.
-# Prebuilt binaries are committed into each release tag by .github/workflows/release.yml.
+# Prebuilt binaries are committed on the `asset-store` branch by .github/workflows/release.yml.
 /.github                        export-ignore
 /.gitattributes                 export-ignore
 /.gitignore                     export-ignore
