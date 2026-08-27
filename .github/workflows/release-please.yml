@@ -1,5 +1,9 @@
 name: release-please
 
+# release-please opens/updates the release PR on every push to main. When that PR is merged it
+# creates the tag + GitHub release, and this same run then builds and publishes the binaries via
+# release.yml (workflow_call) — a separate `on: push: tags` workflow would never fire, because
+# events created with GITHUB_TOKEN do not trigger other workflows.
 on:
   push:
     branches: [ "main" ]
@@ -11,8 +15,21 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.release-please.outputs.tag_name }}
+    permissions:
+      contents: write

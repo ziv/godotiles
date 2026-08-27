@@ -1,16 +1,30 @@
 name: Release
 
-# On a version tag (created by release-please): build the extension for every platform, commit
-# the prebuilt binaries into the tag itself (an off-branch commit on top of the tagged main
-# commit, so `main` stays binary-free and local builds never dirty the tree), and attach the
-# addon zip to the GitHub release. After this job:
-#   - the tag's source archive (GitHub "Download ZIP", Asset Store repository pulls) contains
-#     exactly addons/godotiles/** WITH bin/ — see .gitattributes for the export-ignore rules
-#   - godotiles-<version>.zip on the release contains the same addons/godotiles/** tree
+# Build the extension for every platform and publish it for one release tag.
+#
+# Called by release-please.yml in the same run that creates the release (a tag created with
+# GITHUB_TOKEN never fires `on: push: tags`, so cross-workflow triggering does not work), or run
+# by hand (workflow_dispatch) to (re)publish binaries for an existing tag.
+#
+# After this workflow:
+#   - godotiles-<version>.zip (addons/godotiles/** with bin/) is attached to the GitHub release
+#   - the `asset-store` branch holds the tagged commit + bin/ — a stable ref whose source archive
+#     (GitHub "Download ZIP", Asset Store repository pulls) contains the addon with binaries; see
+#     .gitattributes for the export-ignore rules. The release tag itself is never rewritten, so
+#     release-please keeps a clean view of main.
 on:
-  push:
-    tags: [ "v*" ]
+  workflow_call:
+    inputs:
+      tag:
+        description: "Release tag to build and publish (e.g. v0.1.2)"
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build and publish (e.g. v0.1.2)"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -20,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
       - uses: dtolnay/rust-toolchain@stable
       - run: scripts/build.sh release
       - uses: actions/upload-artifact@v4
@@ -31,10 +47,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-apple-darwin, x86_64-apple-darwin
       - run: scripts/build.sh release
+      - run: lipo -info addons/godotiles/bin/macos/libgodotiles.dylib
       - uses: actions/upload-artifact@v4
         with:
           name: macos
@@ -44,6 +63,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
       - uses: dtolnay/rust-toolchain@stable
       - run: |
           cargo build --manifest-path rust/Cargo.toml --release
@@ -60,7 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          ref: ${{ inputs.tag }}
       - uses: actions/download-artifact@v4
         with:
           name: linux-x86_64
@@ -84,26 +105,36 @@ jobs:
 
       - name: Zip addon (addons/godotiles/** only)
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${TAG#v}"
           zip -r "godotiles-${VERSION}.zip" addons/godotiles
           unzip -l "godotiles-${VERSION}.zip"
           echo "ASSET=godotiles-${VERSION}.zip" >> "$GITHUB_ENV"
+        env:
+          TAG: ${{ inputs.tag }}
 
-      - name: Commit the binaries into the release tag
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Attach to the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: ${{ env.ASSET }}
+
+      - name: Publish the asset-store branch (tagged commit + bin/)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --detach "$TAG"
           git add -f addons/godotiles/bin
-          git commit -m "chore(release): prebuilt binaries for ${GITHUB_REF_NAME}"
-          git tag -f "${GITHUB_REF_NAME}"
-          git push -f origin "refs/tags/${GITHUB_REF_NAME}"
-
-      - name: Attach to the GitHub release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ${{ env.ASSET }}
+          git commit -q -m "chore(release): prebuilt binaries for ${TAG}"
+          git push -f origin "HEAD:refs/heads/asset-store"
+          SHA="$(git rev-parse HEAD)"
+          {
+            echo "## ${TAG} published"
+            echo
+            echo "- release asset: \`${ASSET}\`"
+            echo "- \`asset-store\` branch: \`${SHA}\` (use this commit for Asset Store repository pulls)"
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          TAG: ${{ inputs.tag }}
 
       - uses: actions/upload-artifact@v4
         with:
