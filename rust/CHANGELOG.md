@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/ziv/godotiles/compare/v0.1.2...v0.1.3) (2026-08-27)
+
+
+### Features
+
+* first build with assets ([6e909fd](https://github.com/ziv/godotiles/commit/6e909fde5e575280743bdb880455110529cb4c0f))
+
 ## [0.1.2](https://github.com/ziv/godotiles/compare/v0.1.1...v0.1.2) (2026-08-26)
 
 
