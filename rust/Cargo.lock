@@ -255,7 +255,7 @@ dependencies = [
 
 [[package]]
 name = "godotiles"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "crossbeam-channel",
  "glam 0.29.3",
